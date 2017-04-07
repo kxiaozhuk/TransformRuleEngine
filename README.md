@@ -1,8 +1,14 @@
-# TransformRuleEngine
+# TRML
 
-基于PMML改成了部分XML元素，生成只处理转换规则的TRML(Transform Rule Makeup Language)，将其中的TransformDictionary改为TransformRule，将DeriveField改为DeriveRule，并重写了Expression，改为RuleExpression，扩展实现了各类型规则Expression，对于evaluator也重写了，改为RuleEvaluator，用于规则的执行。
+基于PMML改成了部分XML元素，生成只处理转换规则的TRML(Transform Rule Makeup Language)，具体改动如下：
 
-# Pom.xml部分内容如下
+1.保留了DataDictionary存储数据字典
+
+2.将其中的TransformDictionary改为TransformRule存储一组转换规则，子元素DeriveField改为DeriveRule表示每一条具体转换规则，重写了Expression，改为RuleExpression，扩展实现了各类型的表达式，为具体的转换规则定义
+
+3.对于evaluator也重写了，参照该类，重新定义了一个新类RuleEvaluator，用于规则的新建和执行等。
+
+# pom.xml
 
     <groupId>com.grouptech.trml</groupId>
     <artifactId>TransformRuleEngine</artifactId>
@@ -42,7 +48,7 @@
         </dependency>
     </dependencies>
     
-   # Example
+# Example
    
         TRMLExample trmlExample = new TRMLExample();
         TRML trml = trmlExample.newTRML();
@@ -55,21 +61,7 @@
         dataMap.put(FieldName.create("balance"), FieldValueUtil.create(DataType.DOUBLE,null,15000));
         dataMap.put(FieldName.create("y"), FieldValueUtil.create(DataType.STRING,null,"no"));
         dataMap.put(FieldName.create("capital"), FieldValueUtil.create(DataType.DOUBLE,null,30000.0));
-        /**
-         * dataField: age,marital,term,balance,y,capital,job,living
-         * rule01:
-         * age -> Disperse -> age
-         * marital -> EqualValues -> marital
-         * term -> Math -> term
-         * balance -> Normalize -> balance
-         * y -> MissingMap -> y
-         * capital -> ZScore -> capital
-         * outputField:age,marital,term,balance,y,capital,job,living
-         * rule02:
-         * age -> Rename -> ageGroup
-         * debit -> Sql -> debit *new column
-         * outputField:ageGroup,marital,term,balance,y,capital,job,living,debit
-         */
+
         Map<FieldName, FieldValue> resMap = evaluator.evaluate(dataMap);
         resMap.entrySet().forEach(entry -> {
             System.out.println("field: " + entry.getKey().getValue() + ",dataType: " + entry.getValue().getDataType() + ",value: "+ entry.getValue().getValue());
