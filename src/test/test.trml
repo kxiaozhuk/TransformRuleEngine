@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TRML x-baseVersion="1.0.0" xmlns="http://www.dmg.org/PMML-4_3">
+    <DataDictionary numberOfFields="8">
+        <DataField name="age" optype="continuous" dataType="integer"/>
+        <DataField name="marital" optype="categorical" dataType="string"/>
+        <DataField name="balance" optype="continuous" dataType="double"/>
+        <DataField name="y" optype="categorical" dataType="string"/>
+        <DataField name="term" optype="continuous" dataType="integer"/>
+        <DataField name="capital" optype="continuous" dataType="double"/>
+        <DataField name="job" optype="categorical" dataType="string"/>
+        <DataField name="living" optype="categorical" dataType="string"/>
+    </DataDictionary>
+    <TransformationRule>
+        <DerivedRule name="newEqualValues" seqNo="1">
+            <EqualValues field="marital" mapMissingTo="missing" defaultValue="unknown" dataType="string">
+                <EqualValuesMap mapValue="单身" equalValue="single"/>
+                <EqualValuesMap mapValue="结婚" equalValue="married"/>
+                <EqualValuesMap mapValue="离婚" equalValue="divorced"/>
+            </EqualValues>
+        </DerivedRule>
+        <DerivedRule name="newNormalize" seqNo="1">
+            <Normalize field="balance" minValue="1000.0" maxValue="50000.0"/>
+        </DerivedRule>
+        <DerivedRule name="newMissingMap" seqNo="1">
+            <MissingMap field="y" mapType="mode" mapValue="'yes'"/>
+        </DerivedRule>
+        <DerivedRule name="newMath" seqNo="1">
+            <MathExpression field="term" function="abs" base="0"/>
+        </DerivedRule>
+        <DerivedRule name="newZScore" seqNo="1">
+            <ZScore field="capital" meanValue="50000.0" stddevValue="10.1"/>
+        </DerivedRule>
+        <DerivedRule name="newDisperse" seqNo="1">
+            <Disperse field="age">
+                <DisperseBin binValue="young" closure="closedOpen" leftMargin="1.0" rightMargin="18.0"/>
+                <DisperseBin binValue="medial" closure="closedOpen" leftMargin="18.0" rightMargin="30.0"/>
+                <DisperseBin binValue="older" closure="closedOpen" leftMargin="30.0"/>
+            </Disperse>
+        </DerivedRule>
+        <DerivedRule name="newSql" seqNo="2">
+            <SqlExpression field="debit" outputField="debit" sqlText="capital - balance"/>
+        </DerivedRule>
+        <DerivedRule name="newRename" seqNo="2">
+            <Rename field="age" outputField="ageGroup"/>
+        </DerivedRule>
+    </TransformationRule>
+</TRML>
